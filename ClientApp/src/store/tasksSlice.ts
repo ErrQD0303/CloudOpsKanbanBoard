@@ -23,6 +23,12 @@ const tasksSlice = createSlice({
     addTask: (state, action: PayloadAction<Task>) => {
       state.items.push(action.payload);
     },
+    updateTask: (state, action: PayloadAction<Task>) => {
+      const index = state.items.findIndex((t) => t.id === action.payload.id);
+      if (index !== -1) {
+        state.items[index] = action.payload;
+      }
+    },
     updateTaskStatus: (
       state,
       action: PayloadAction<UpdateTaskStatusPayload>,
@@ -38,7 +44,11 @@ const tasksSlice = createSlice({
   },
 });
 
-export const { setTasks, addTask, updateTaskStatus, deleteTask } =
+export const getTasks = (state: { tasks: TaskState }) => state.tasks.items;
+export const isTasksLoading = (state: { tasks: TaskState }) =>
+  state.tasks.loading;
+
+export const { setTasks, addTask, updateTaskStatus, deleteTask, updateTask } =
   tasksSlice.actions;
 
 export default tasksSlice.reducer;

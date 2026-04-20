@@ -1,3 +1,17 @@
 {
-  "name": "Hello"
+  "tasks": [
+    {
+      "id": "fzCP3PMCVTA",
+      "title": "421",
+      "description": "fdasfsdfsadf",
+      "status": "TODO"
+    },
+    {
+      "title": "152",
+      "description": "124",
+      "status": "TODO",
+      "id": "50Yxmv9ZkWA"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
