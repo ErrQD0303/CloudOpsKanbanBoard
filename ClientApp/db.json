@@ -11,6 +11,12 @@
       "description": "124",
       "status": "TODO",
       "id": "50Yxmv9ZkWA"
+    },
+    {
+      "id": "mock-id-123",
+      "title": "Deploy to Azure",
+      "description": "Push static assets to blob storage.",
+      "status": "TODO"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
