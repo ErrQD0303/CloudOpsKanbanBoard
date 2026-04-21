@@ -164,4 +164,4 @@ stages:
                                 chmod +x $SCRIPT_FILE
 
                                 $SCRIPT_FILE $(TF_VAR_ENVIRONMENT) dist
-              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+              workingDirectory: "$(System.DefaultWorkingDirectory)"
