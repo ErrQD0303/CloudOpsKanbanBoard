@@ -147,7 +147,7 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                SCRIPT_FILE=./sripts/build-frontend-app.sh
+                SCRIPT_FILE=./scripts/build-frontend-app.sh
 
                                 chmod +x $SCRIPT_FILE
 
