@@ -1,0 +1,47 @@
+trigger:
+  branches:
+    include:
+      - release/*
+  paths:
+    include:
+      - "ClientApp/**"
+      - "ServerApp/**"
+
+variables:
+  - group: infra-provision-pipeline-vars-group
+
+stages:
+  - stage: Deploy
+    displayName: "Deploy Application"
+    jobs:
+      - job: Deploy_Frontend
+        displayName: "Deploy Frontend"
+        pool:
+          name: "Default"
+        steps:
+          - checkout: self
+            clean: "true"
+
+          - task: Bash@3
+            displayName: "Build Fronend Application"
+            inputs:
+              targetType: "inline"
+              script: |
+                SCRIPT_FILE=terraform/scripts/build-frontend-app.sh
+
+                                chmod +x $SCRIPT_FILE
+
+                                $SCRIPT_FILE
+              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+
+          - task: Bash@3
+            displayName: "Upload Frontend Files"
+            inputs:
+              targetType: "inline"
+              script: |
+                SCRIPT_FILE=terraform/scripts/upload-frontend.sh
+
+                                chmod +x $SCRIPT_FILE
+
+                                $SCRIPT_FILE $(TF_VAR_ENVIRONMENT) dist
+              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
