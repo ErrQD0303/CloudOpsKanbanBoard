@@ -163,6 +163,8 @@ stages:
               script: |
                 SCRIPT_FILE=terraform/scripts/upload-frontend.sh
 
+                sed -i 's/\r//g' terraform/scripts/upload-frontend.sh
+
                                 chmod +x $SCRIPT_FILE
 
                                 $SCRIPT_FILE $(TF_VAR_ENVIRONMENT) dist
