@@ -1,4 +1,4 @@
-#! /usr/bin/bash
+#!/usr/bin/bash
 
 # This script is responsible for building the frontend application using npm. It should be run from the root of the project directory.
 # From this directory, you can run the following command to build the frontend application:
