@@ -9,7 +9,7 @@ import {
   updateTaskStatus,
 } from "@/store/tasksSlice";
 import { type CreateTaskPayload } from "@/types/Task";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import type {
   CreateUpdateTaskPayload,
   Task,
@@ -96,24 +96,41 @@ export const useBoardLogic = () => {
     setIsCreateTaskModalOpen(true);
   };
 
-  const handleMoveTask = async (id: string, newStatus: TaskStatus) => {
-    try {
-      await tasksService.updateStatus({ id, status: newStatus });
-      dispatch(updateTaskStatus({ id, status: newStatus })); // We need to both update the task in the global state and persistently save it to the backend, if the backend fails to save the task, this line will not execute, and the task will not be updated in the global state, which is the desired behavior
-    } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error("Failed to move task:", error);
+  const handleMoveTask = useCallback(
+    async (id: string, newStatus: TaskStatus) => {
+      try {
+        await tasksService.updateStatus({ id, status: newStatus });
+        dispatch(updateTaskStatus({ id, status: newStatus })); // We need to both update the task in the global state and persistently save it to the backend, if the backend fails to save the task, this line will not execute, and the task will not be updated in the global state, which is the desired behavior
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          console.error("Failed to move task:", error);
+        }
       }
-    }
-  };
+    },
+    [dispatch],
+  );
 
-  const handleUpdateTaskModalOpen = (id: string) => {
-    const taskToEdit = tasks.find((t) => t.id === id);
-    // Logic to open the update modal and populate it with the task's current details can be implemented here
-    setIsUpdateTaskModalOpen(true);
-    setSelectedTask(taskToEdit);
-  };
-
+  const handleUpdateTaskModalOpen = useCallback(
+    (taskId?: string) => {
+      if (taskId) {
+        // If a task ID is provided, we are opening the modal to update an existing task
+        const taskToEdit = tasks.find((t) => t.id === taskId);
+        if (taskToEdit) {
+          setSelectedTask(taskToEdit);
+          setIsUpdateTaskModalOpen(true);
+        } else {
+          if (import.meta.env.DEV) {
+            console.warn(`Task with ID ${taskId} not found for editing.`);
+          }
+        }
+      } else {
+        // If no task ID is provided, we are opening the modal to create a new task
+        setSelectedTask(undefined);
+        setIsUpdateTaskModalOpen(true);
+      }
+    },
+    [tasks],
+  );
   const handleUpdateTaskModalClose = () => {
     setIsUpdateTaskModalOpen(false);
     setSelectedTask(undefined);

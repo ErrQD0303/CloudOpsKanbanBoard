@@ -77,7 +77,7 @@ export default function Board() {
                       key={task.id}
                       task={task}
                       onMove={handleMoveTask}
-                      onCardClick={() => handleUpdateTaskModalOpen(task.id)}
+                      onCardClick={handleUpdateTaskModalOpen}
                     />
                   ))}
                 </Box>

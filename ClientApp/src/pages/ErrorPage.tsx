@@ -1,7 +1,7 @@
 // type Props = {};
 
-function Error() {
+function ErrorPage() {
   return <div>404 - Something went wrong</div>;
 }
 
-export default Error;
+export default ErrorPage;

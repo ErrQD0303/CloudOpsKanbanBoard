@@ -1,6 +1,9 @@
 import RootLayout from "@/layouts/RootLayout";
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { Board, ErrorPage } from "./lazyComponents";
+import { Board } from "./lazyComponents";
+import { Suspense } from "react";
+import ErrorPage from "@/pages/ErrorPage";
+import PageLoader from "@/components/PageLoader";
 
 export const router = createBrowserRouter([
   {
@@ -14,7 +17,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "board",
-        element: <Board />,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <Board />
+          </Suspense>
+        ),
       },
     ],
   },

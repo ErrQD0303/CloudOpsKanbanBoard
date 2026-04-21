@@ -15,17 +15,23 @@ import { COLUMNS } from "@/utilities/constants";
 import { useAppDispatch } from "@/store/hooks";
 import { deleteTask } from "@/store/tasksSlice";
 import { tasksService } from "@/services/taskService";
-import type { MouseEvent } from "react";
+import { type MouseEvent, memo } from "react";
 
 interface TaskCardProps {
   task: Task;
   // Later, we will pass down an 'onMove' or 'onClick' function here
   onMove: (id: string, newStatus: TaskStatus) => void;
-  onCardClick?: () => void; // Optional click handler for the card itself (e.g., to open a details modal)
+  onCardClick?: (id?: string) => void; // Optional click handler for the card itself (e.g., to open a details modal)
 }
 
-export default function TaskCard({ task, onMove, onCardClick }: TaskCardProps) {
-  const dispatch = useAppDispatch();
+export default memo(function TaskCard({
+  task,
+  onMove,
+  onCardClick,
+}: TaskCardProps) {
+  const dispatch = useAppDispatch(); // dispatch will not change, so it's safe to use directly without useCallback or useMemo
+  // without useState, the component will re-render whenever the parent re-renders or when the task prop changes, which is what we want, since we want to reflect the latest task data and allow the parent to control when the card re-renders by changing the task prop
+  // So we don't need to use useCallback for the event handlers, since they don't need to be memoized and won't cause unnecessary re-renders of the card itself, and we can just define them directly in the component body
 
   const handleDeleteTask = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation(); // Prevent the click from bubbling up to the card's onClick (if we add one later)
@@ -44,8 +50,12 @@ export default function TaskCard({ task, onMove, onCardClick }: TaskCardProps) {
     e.stopPropagation(); // Prevent the click from bubbling up to the card's onClick (if we add one later)
   };
 
+  const handleCardClick = () => {
+    onCardClick?.(task.id); // Call the onCardClick prop if it exists, passing the task ID
+  };
+
   return (
-    <Card sx={{ mb: 2 }} onClick={onCardClick}>
+    <Card sx={{ mb: 2 }} onClick={handleCardClick}>
       <CardContent>
         <Box
           sx={{
@@ -113,4 +123,4 @@ export default function TaskCard({ task, onMove, onCardClick }: TaskCardProps) {
       </CardContent>
     </Card>
   );
-}
+});

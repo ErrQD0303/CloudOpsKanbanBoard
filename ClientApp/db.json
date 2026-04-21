@@ -1,16 +1,10 @@
 {
   "tasks": [
     {
-      "id": "fzCP3PMCVTA",
-      "title": "421",
-      "description": "fdasfsdfsadf",
-      "status": "TODO"
-    },
-    {
+      "id": "50Yxmv9ZkWA",
       "title": "152",
-      "description": "124",
-      "status": "TODO",
-      "id": "50Yxmv9ZkWA"
+      "description": "OK",
+      "status": "IN_PROGRESS"
     },
     {
       "id": "mock-id-123",
