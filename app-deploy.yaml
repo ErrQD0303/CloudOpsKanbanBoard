@@ -28,6 +28,8 @@ stages:
               targetType: "inline"
               script: |
                 SCRIPT_FILE=./scripts/build-frontend-app.sh
+                                
+                                sed -i 's/\r//g' scripts/build-frontend-app.sh
 
                                 chmod +x $SCRIPT_FILE
 
