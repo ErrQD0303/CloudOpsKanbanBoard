@@ -1,0 +1,15 @@
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfvars
+**/.env
+**/sp.env
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfvars
+**/.terraform/
+terraform/service_principal.json
+**/.terraform/
+**/.terraform/
+terraform/service_principal.json
+service_principal.json
+dist/
