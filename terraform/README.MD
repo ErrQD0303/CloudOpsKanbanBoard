@@ -6,6 +6,7 @@
 
    ```bash
    source scripts/create-service-principal.sh
+
    ```
 
    This command will output the necessary credentials (client ID, client secret, tenant ID, and subscription ID) that you will need to set as environment variables.

@@ -147,7 +147,9 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                SCRIPT_FILE=terraform/scripts/build-frontend-app.sh
+                SCRIPT_FILE=scripts/build-frontend-app.sh
+
+                sed -i 's/\r//g' scripts/build-frontend-app.sh
 
                                 chmod +x $SCRIPT_FILE
 
@@ -159,7 +161,9 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                SCRIPT_FILE=terraform/scripts/upload-frontend.sh
+                SCRIPT_FILE=scripts/upload-frontend.sh
+
+                sed -i 's/\r//g' scripts/upload-frontend.sh
 
                                 chmod +x $SCRIPT_FILE
 
