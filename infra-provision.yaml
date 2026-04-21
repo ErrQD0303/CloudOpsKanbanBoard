@@ -147,7 +147,7 @@ stages:
             inputs:
               targetType: "inline"
               script: |
-                SCRIPT_FILE=terraform/scripts/build-frontend-app.sh
+                SCRIPT_FILE=./scripts/build-frontend-app.sh
 
                                 chmod +x $SCRIPT_FILE
 
@@ -164,4 +164,4 @@ stages:
                                 chmod +x $SCRIPT_FILE
 
                                 $SCRIPT_FILE $(TF_VAR_ENVIRONMENT) dist
-              workingDirectory: "$(System.DefaultWorkingDirectory)"
+              workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
