@@ -43,7 +43,7 @@ export default memo(function TaskCard({
 
   const handleStatusChange = (e: SelectChangeEvent) => {
     const newStatus = e.target.value as TaskStatus;
-    onMove(task.id, newStatus);
+    onMove(task.id, newStatus, task.row_version); // Pass the current
   };
 
   const handleTaskStatusClick = (e: MouseEvent) => {

@@ -36,6 +36,7 @@ const tasksSlice = createSlice({
       const task = state.items.find((t) => t.id === action.payload.id);
       if (task) {
         task.status = action.payload.status;
+        task.row_version = action.payload.row_version; // Update the row_version in the state to match the new value from the backend
       }
     },
     deleteTask: (state, action: PayloadAction<string>) => {

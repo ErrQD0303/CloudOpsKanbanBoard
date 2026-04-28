@@ -4,13 +4,8 @@
       "id": "50Yxmv9ZkWA",
       "title": "152",
       "description": "OK",
-      "status": "IN_PROGRESS"
-    },
-    {
-      "id": "mock-id-123",
-      "title": "Deploy to Azure",
-      "description": "Push static assets to blob storage.",
-      "status": "TODO"
+      "status": "DONE",
+      "rowVersion": "AAAAAAAAB9E="
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

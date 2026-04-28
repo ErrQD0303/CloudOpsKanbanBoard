@@ -26,6 +26,9 @@ export const useCreateUpdateTaskModal = ({
   const [status, setStatus] = useState<TaskStatus>(
     taskStatuses[0] as TaskStatus,
   ); // Default to "TODO"
+  const [taskRowVersion, setTaskRowVersion] = useState<string | undefined>(
+    task?.row_version,
+  );
   const [errors, setErrors] = useState<CreateTaskPayloadError>({});
 
   const resetStates = () => {
@@ -34,6 +37,7 @@ export const useCreateUpdateTaskModal = ({
     setDescription("");
     setStatus(taskStatuses[0] as TaskStatus);
     setErrors({});
+    setTaskRowVersion(undefined);
   };
 
   const validateAndCreate = () => {
@@ -55,7 +59,13 @@ export const useCreateUpdateTaskModal = ({
       return;
     }
 
-    onSubmit({ id: cardId, title, description, status });
+    onSubmit({
+      id: cardId,
+      title,
+      description,
+      status,
+      row_version: taskRowVersion,
+    }); // Default to "TODO"
 
     resetStates();
   };
@@ -79,6 +89,7 @@ export const useCreateUpdateTaskModal = ({
         setTitle(task.title);
         setDescription(task.description);
         setStatus(task.status);
+        setTaskRowVersion(task.row_version);
       } else {
         resetStates();
       }
