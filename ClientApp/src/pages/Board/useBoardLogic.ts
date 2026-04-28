@@ -40,7 +40,7 @@ export const useBoardLogic = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [dispatch]);
+  }, [dispatch, fetchTasks]);
 
   // Future logic for handling task updates, drag-and-drop, etc. can be added here
   const handleCreateTask = async ({

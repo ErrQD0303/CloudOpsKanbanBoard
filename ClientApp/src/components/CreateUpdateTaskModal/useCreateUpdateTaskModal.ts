@@ -47,7 +47,7 @@ export const useCreateUpdateTaskModal = ({
       return;
     }
 
-    onSubmit({ title, description, status }); // Default to "TODO"
+    onSubmit({ title, description, status, row_version: null! }); // Default to "TODO"
 
     resetStates();
   };
@@ -64,7 +64,7 @@ export const useCreateUpdateTaskModal = ({
       title,
       description,
       status,
-      row_version: taskRowVersion,
+      row_version: taskRowVersion!,
     }); // Default to "TODO"
 
     resetStates();
