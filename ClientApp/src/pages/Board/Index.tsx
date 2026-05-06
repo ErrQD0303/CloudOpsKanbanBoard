@@ -66,7 +66,12 @@ export default function Board() {
             <Grid key={col.id} size={{ xs: 12, md: 4 }}>
               <Paper
                 elevation={3}
-                sx={{ p: 2, bgcolor: "grey.100", minHeight: "70vh" }}
+                sx={{
+                  p: 2,
+                  bgcolor: "grey.100",
+                  minHeight: "70vh",
+                  borderRadius: "20px",
+                }}
               >
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: "bold" }}>
                   {col.title} ({columnTotalItems})

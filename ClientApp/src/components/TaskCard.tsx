@@ -20,7 +20,7 @@ import { type MouseEvent, memo } from "react";
 interface TaskCardProps {
   task: Task;
   // Later, we will pass down an 'onMove' or 'onClick' function here
-  onMove: (id: string, newStatus: TaskStatus) => void;
+  onMove: (id: string, newStatus: TaskStatus, rowVersion: string) => void;
   onCardClick?: (id?: string) => void; // Optional click handler for the card itself (e.g., to open a details modal)
 }
 

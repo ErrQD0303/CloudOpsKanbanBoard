@@ -1,19 +1,22 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>9c60ba6f-8309-4623-8e74-fcf01760ed4e</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.15" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ServerAppLibs\ServerApp.Data\ServerApp.Data.csproj" />
     <ProjectReference Include="..\ServerAppLibs\ServerApp.TaskService\ServerApp.TaskService.csproj" />
+    <ProjectReference Include="..\ServerAppLibs\ServerApp.MongoDbTaskRepository\ServerApp.MongoDbTaskRepository.csproj" />
   </ItemGroup>
 
 </Project>

@@ -6,14 +6,15 @@ using ServerApp.TaskRepository;
 namespace ServerApp.UnitOfWork;
 
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork<TDbContext> : IUnitOfWork
+where TDbContext : DbContext
 {
-    private readonly AppDbContext _dbContext;
+    private readonly TDbContext _dbContext;
     private IDbContextTransaction? _currentTransaction;
     public ITaskRepository Tasks
     { get; }
 
-    public UnitOfWork(ITaskRepository taskRepository, AppDbContext dbContext)
+    public UnitOfWork(ITaskRepository taskRepository, TDbContext dbContext)
     {
         // Initialize repositories here
         Tasks = taskRepository;

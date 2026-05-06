@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using ServerApp.Data;
+using ServerApp.MongoDbTaskRepository;
+using ServerApp.MongoDbTaskRepository.Data;
+using ServerApp.MongoDbTaskRepository.Options;
 using ServerApp.Shared;
 using ServerApp.TaskRepository;
 using ServerApp.TaskService;
@@ -14,13 +17,40 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddSwaggerGen(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString(AppConstants.Settings.ConnectionStrings.SQLServerConnection));
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Version = "v1",
+        Title = "ServerApp API",
+        Description = "API for managing tasks in the Kanban board application"
+    });
 });
-// Register UnitOfWork and TaskService with dependency injection
-builder.Services.AddUnitOfWork<UnitOfWork, TaskRepository>();
+var dbProvider = builder.Configuration.GetValue<string>(AppConstants.Settings.DBProvider)?.ToLower();
+if (string.Equals(dbProvider, "sqlserver", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString(AppConstants.Settings.ConnectionStrings.SQLServerConnection));
+    });
+    // Register UnitOfWork and TaskService with dependency injection
+    builder.Services.AddUnitOfWork<UnitOfWork<AppDbContext>, TaskRepository>();
+}
+else if (string.Equals(dbProvider, "mongodb", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddDbContext<MongoDBApplicationDbContext>(options =>
+    {
+        MongoDbOptions mongoDbOptions = builder.Configuration.GetSection("MongoDbOptions").Get<MongoDbOptions>() ?? throw new InvalidOperationException("Failed to bind MongoDB options from configuration.");
+        options.UseMongoDB(mongoDbOptions.ConnectionString, mongoDbOptions.DatabaseName);
+        // Register UnitOfWork and TaskService with dependency injection
+    });
+    builder.Services.AddUnitOfWork<UnitOfWork<MongoDBApplicationDbContext>, MongoDBTaskRepository>();
+}
+else
+{
+    var validProviders = string.Join(" or ", new AppConstants.Settings().ValidDbProviders);
+    throw new InvalidOperationException($"Invalid database provider specified in configuration. Please set 'DBProvider' to either {validProviders} in appsettings.json.");
+}
 builder.Services.AddTaskService<TaskService>();
 builder.Services.AddCors(options =>
 {
@@ -30,6 +60,11 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
+});
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString(AppConstants.Settings.ConnectionStrings.RedisConnection);
+    options.InstanceName = "TodoListApp_"; // Optional: Prefix for Redis keys to avoid collisions
 });
 
 var app = builder.Build();
