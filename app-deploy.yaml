@@ -1,11 +1,13 @@
 trigger:
   branches:
     include:
-      - release/*
+      - main/*
   paths:
     include:
       - "ClientApp/**"
       - "ServerApp/**"
+
+pr: none # Disable Pull Request triggern to 'default' branch, which is 'main' in this case. We only want to trigger on release branches.
 
 variables:
   - group: infra-provision-pipeline-vars-group
@@ -36,12 +38,13 @@ stages:
                                 $SCRIPT_FILE
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
 
-          - task: PublishBuildArtifacts@1
-            displayName: "Publish Frontend Build Artifacts"
+          - task: PublishPipelineArtifact@1
+            displayName: "Publish Frontend Artifact to Pipeline Storage"
             inputs:
-              PathtoPublish: "$(System.DefaultWorkingDirectory)/terraform/dist"
-              ArtifactName: "frontend-build"
-              publishLocation: "Container"
+              # Point this exactly to where the build script outputs the dist folder
+              targetPath: "$(System.DefaultWorkingDirectory)/terraform/dist"
+              artifact: "frontend_dist_container"
+              publishLocation: "pipeline"
 
   - stage: Deploy
     dependsOn: Build
@@ -55,6 +58,14 @@ stages:
           - checkout: self
             clean: "true"
 
+          - task: DownloadPipelineArtifact@2
+            displayName: "Download Frontend Artifact"
+            inputs:
+              buildType: "current"
+              artifactName: "frontend_dist_container"
+              # This dictates exactly where the downloaded files will land on the agent
+              targetPath: "$(Pipeline.Workspace)/frontend_dist_container"
+
           - task: Bash@3
             displayName: "Upload Frontend Files"
             inputs:
@@ -66,5 +77,5 @@ stages:
 
                                 chmod +x $SCRIPT_FILE
 
-                                $SCRIPT_FILE $(TF_VAR_ENVIRONMENT) dist
+                                $SCRIPT_FILE $(TF_VAR_ENVIRONMENT) $(Pipeline.Workspace)/frontend_dist_container
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
