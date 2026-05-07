@@ -11,11 +11,11 @@ variables:
   - group: infra-provision-pipeline-vars-group
 
 stages:
-  - stage: Deploy
-    displayName: "Deploy Application"
+  - stage: Build
+    displayName: "Build Application"
     jobs:
-      - job: Deploy_Frontend
-        displayName: "Deploy Frontend"
+      - job: Build_Frontend
+        displayName: "Build Frontend"
         pool:
           name: "Default"
         steps:
@@ -35,6 +35,25 @@ stages:
 
                                 $SCRIPT_FILE
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"
+
+          - task: PublishBuildArtifacts@1
+            displayName: "Publish Frontend Build Artifacts"
+            inputs:
+              PathtoPublish: "$(System.DefaultWorkingDirectory)/terraform/dist"
+              ArtifactName: "frontend-build"
+              publishLocation: "Container"
+
+  - stage: Deploy
+    dependsOn: Build
+    displayName: "Deploy Application"
+    jobs:
+      - job: Deploy_Frontend
+        displayName: "Deploy Frontend"
+        pool:
+          name: "Default"
+        steps:
+          - checkout: self
+            clean: "true"
 
           - task: Bash@3
             displayName: "Upload Frontend Files"
