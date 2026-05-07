@@ -7,8 +7,6 @@ trigger:
       - "ClientApp/**"
       - "ServerApp/**"
 
-pr: none # Disable Pull Request triggern to 'default' branch, which is 'main' in this case. We only want to trigger on release branches.
-
 variables:
   - group: infra-provision-pipeline-vars-group
 
@@ -64,7 +62,7 @@ stages:
               buildType: "current"
               artifactName: "frontend_dist_container"
               # This dictates exactly where the downloaded files will land on the agent
-              targetPath: "$(Pipeline.Workspace)/frontend_dist_container"
+              targetPath: "$(System.DefaultWorkingDirectory)/terraform/dist"
 
           - task: Bash@3
             displayName: "Upload Frontend Files"
@@ -77,5 +75,5 @@ stages:
 
                                 chmod +x $SCRIPT_FILE
 
-                                $SCRIPT_FILE $(TF_VAR_ENVIRONMENT) $(Pipeline.Workspace)/frontend_dist_container
+                                $SCRIPT_FILE $(TF_VAR_ENVIRONMENT) dist
               workingDirectory: "$(System.DefaultWorkingDirectory)/terraform"

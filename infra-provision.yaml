@@ -7,8 +7,6 @@ trigger:
       - "terraform/**"
       - "infra-provision.yaml"
 
-pr: none # Disable Pull Request triggern to 'default' branch, which is 'main' in this case. We only want to trigger on release branches.
-
 variables:
   - group: infra-provision-pipeline-vars-group
 
