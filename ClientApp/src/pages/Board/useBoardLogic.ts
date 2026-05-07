@@ -16,6 +16,7 @@ import type {
   TaskStatus,
   UpdateTaskPayload,
 } from "@/types/Task";
+import { isAxiosError } from "axios";
 
 export const useBoardLogic = () => {
   const dispatch = useAppDispatch();
@@ -26,20 +27,20 @@ export const useBoardLogic = () => {
   const [isUpdateTaskModalOpen, setIsUpdateTaskModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task>();
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await tasksService.getAll();
-        dispatch(setTasks(response.data));
-      } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error("Failed to fetch tasks:", error);
-        }
+  const fetchTasks = useCallback(async () => {
+    try {
+      const response = await tasksService.getAll();
+      dispatch(setTasks(response.data));
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error("Failed to fetch tasks:", error);
       }
-    };
-
-    fetchTasks();
+    }
   }, [dispatch]);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [dispatch, fetchTasks]);
 
   // Future logic for handling task updates, drag-and-drop, etc. can be added here
   const handleCreateTask = async ({
@@ -64,26 +65,26 @@ export const useBoardLogic = () => {
     }
   };
 
-  const handleUpdateTask = async ({
-    id,
-    title,
-    description,
-    status,
-  }: CreateUpdateTaskPayload) => {
+  const handleUpdateTask = async (updatedTask: UpdateTaskPayload) => {
     try {
-      const updatedTask: UpdateTaskPayload = {
-        id: id!,
-        title,
-        description,
-        status: status,
-      };
-
-      await tasksService.update(updatedTask);
-      dispatch(updateTask(updatedTask)); // We need to both add the task to the global state and persistently save it to the backend, if the backend fails to save the task, this line will not execute, and the task will not be added to the global state, which is the desired behavior
+      const newUpdatedTask = await tasksService.update(updatedTask);
+      dispatch(updateTask(newUpdatedTask)); // We need to both add the task to the global state and persistently save it to the backend, if the backend fails to save the task, this line will not execute, and the task will not be added to the global state, which is the desired behavior
       setIsUpdateTaskModalOpen(false);
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error("Failed to create task:", error);
+      const canHandleErrors: number[] = [409, 404]; // We want to specifically handle 409 Conflict and 404 Not Found errors that can occur during task status updates, other types of errors will be logged but not handled with specific user feedback, as they may indicate different issues that are not related to concurrent modifications or missing tasks
+      if (
+        isAxiosError(error) &&
+        error.response &&
+        canHandleErrors.includes(error.response.status)
+      ) {
+        alert(
+          "This task has been modified by another user. Please reload the page and try again.",
+        );
+        fetchTasks(); // Refresh the tasks to get the latest data from the backend, which should resolve the conflict
+      } else {
+        if (import.meta.env.DEV) {
+          console.error("Failed to move task:", error);
+        }
       }
     }
   };
@@ -97,17 +98,40 @@ export const useBoardLogic = () => {
   };
 
   const handleMoveTask = useCallback(
-    async (id: string, newStatus: TaskStatus) => {
+    async (id: string, newStatus: TaskStatus, rowVersion: string) => {
       try {
-        await tasksService.updateStatus({ id, status: newStatus });
-        dispatch(updateTaskStatus({ id, status: newStatus })); // We need to both update the task in the global state and persistently save it to the backend, if the backend fails to save the task, this line will not execute, and the task will not be updated in the global state, which is the desired behavior
+        const newRowVersion = await tasksService.updateStatus({
+          id,
+          status: newStatus,
+          row_version: rowVersion,
+        });
+        console.log("Received new rowVersion from backend:", newRowVersion);
+        dispatch(
+          updateTaskStatus({
+            id,
+            status: newStatus,
+            row_version: newRowVersion!, // We can assert that newRowVersion is not undefined here because if the backend successfully updates the task status, it will return the new row_version in the response, and if it fails to update the task status, an error will be thrown and this line will not execute, which is the desired behavior
+          }),
+        ); // We need to both update the task in the global state and persistently save it to the backend, if the backend fails to save the task, this line will not execute, and the task will not be updated in the global state, which is the desired behavior
       } catch (error) {
-        if (import.meta.env.DEV) {
-          console.error("Failed to move task:", error);
+        const canHandleErrors: number[] = [409, 404]; // We want to specifically handle 409 Conflict and 404 Not Found errors that can occur during task status updates, other types of errors will be logged but not handled with specific user feedback, as they may indicate different issues that are not related to concurrent modifications or missing tasks
+        if (
+          isAxiosError(error) &&
+          error.response &&
+          canHandleErrors.includes(error.response.status)
+        ) {
+          alert(
+            "This task has been modified by another user. Please reload the page and try again.",
+          );
+          fetchTasks(); // Refresh the tasks to get the latest data from the backend, which should resolve the conflict
+        } else {
+          if (import.meta.env.DEV) {
+            console.error("Failed to move task:", error);
+          }
         }
       }
     },
-    [dispatch],
+    [dispatch, fetchTasks],
   );
 
   const handleUpdateTaskModalOpen = useCallback(

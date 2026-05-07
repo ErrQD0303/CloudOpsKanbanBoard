@@ -1,3 +1,5 @@
+// Unit tests for the TaskCard component using Vitest and React Testing Library
+
 import { render, screen } from "@testing-library/react";
 import TaskCard from "./TaskCard";
 import { type Task } from "@/types/Task";
@@ -5,6 +7,7 @@ import { vi, describe, it, expect } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { Provider } from "react-redux";
 import { store } from "@/store/store";
+import { generateRowVersion } from "@/utilities/helpers"; // Import the helper function to generate mock row_version values
 
 describe("TaskCard", () => {
   const mockTask: Task = {
@@ -12,6 +15,7 @@ describe("TaskCard", () => {
     title: "Deploy to Azure",
     description: "Push static assets to blob storage.",
     status: "TODO",
+    row_version: generateRowVersion(), // Mock row_version for testing
   };
 
   it("renders the task data correctly", () => {
@@ -58,7 +62,11 @@ describe("TaskCard", () => {
 
     // 3. Assert: Verify our spy function was called with the correct arguments
     expect(handleMoveSpy).toHaveBeenCalledTimes(1);
-    expect(handleMoveSpy).toHaveBeenCalledWith(mockTask.id, "IN_PROGRESS");
+    expect(handleMoveSpy).toHaveBeenCalledWith(
+      mockTask.id,
+      "IN_PROGRESS",
+      mockTask.row_version,
+    );
   });
 
   it("calls onCardClick when the card is clicked", async () => {
